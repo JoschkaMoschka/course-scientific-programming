@@ -280,66 +280,130 @@ A typical software development workflow looks like this:
 GitHub can be configured to automatically runs workflows defined through [YAML](https://en.wikipedia.org/wiki/YAML) files in a folder named `.github/workflows/`.
 
 > [!TIP]
-> See https://github.com/rajgoel/MyDemoPackage.jl/ for a sample package.
+> The group projects are cloned from https://github.com/KLU-BADS/ProjectTemplate.jl and include workflows that are automatically run.
 
 ---
 
 ### CI for automatic testing
 
 ```yaml
-name: Run tests
-on: [push, pull_request]
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Cancel an in-progress run when a new commit is pushed to the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
+    name: Julia ${{ matrix.julia-version }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        julia-version: ['1.11']
-        julia-arch: [x64]
-        os: [ubuntu-latest] # [ubuntu-latest, windows-latest, macOS-latest]
+        julia-version: ['1']
+        os: [ubuntu-latest]
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@latest
+      - uses: actions/checkout@v4
+
+      - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.julia-version }}
-      - uses: julia-actions/julia-buildpkg@latest
-      - uses: julia-actions/julia-runtest@latest
+
+      - uses: julia-actions/cache@v2
+
+      - uses: julia-actions/julia-buildpkg@v1
+
+      - uses: julia-actions/julia-runtest@v1
 ```
 
-> [!TIP]
-> Fork the project https://github.com/rajgoel/MyDemoPackage.jl/ and make changes to adapt to your needs.
+> [!NOTE]
+> Group projects are pre-configured to automatically run tests. You are expected to write tests that ensure that your project is doing what it is supposed to do. **Never let tests fails in `main`!** Testing will be part of the final assessment.
 
 ---
 
 ### CD for automatic deployment of documentation
 
 ```yaml
-name: Create documentation
+name: Documentation
+
 on:
   push:
-    branches:
-      - main
-    tags: '*'
+    branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one deployment at a time; do not cancel a run that is already
+# publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   build:
+    name: Build documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@latest
+      - uses: actions/checkout@v4
+
+      - uses: julia-actions/setup-julia@v2
         with:
-          version: '1.11'
-      - name: Install dependencies
-        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
-      - name: Build and deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key
-        run: julia --project=docs/ docs/make.jl
+          version: '1'
+
+      - uses: julia-actions/cache@v2
+
+      # PlantUML renders the diagrams by running plantuml.jar.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install documentation dependencies
+        run: |
+          julia --project=docs -e '
+            using Pkg
+            Pkg.instantiate()'
+
+      - name: Build documentation
+        run: julia --project=docs docs/make.jl
+
+      - name: Upload Pages artifact
+        # Only on main: pull request runs build the docs to catch errors,
+        # but do not publish them.
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/build
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
 ```
 
-> [!TIP]
-> Fork the project https://github.com/rajgoel/MyDemoPackage.jl/ and make changes to adapt to your needs. For automatic deployment you may need to follow instructions given in the `README.md` of the project.
+> [!NOTE]
+> Group projects are pre-configured to build and deploy documentation. This documentation will be part of the final assessment.
+
 
 ===
 

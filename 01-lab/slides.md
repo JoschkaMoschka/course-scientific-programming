@@ -54,6 +54,7 @@ Grading will be based to 100% on a group project evaluated by
 > [!IMPORTANT]
 > - Group members who do not work on the issues or conduct the code reviews assigned to them may receive lower grades than those who do. 
 > - **Contribution concerns** must be raised with the instructor **before the respective deadlines**.
+> - E-Assignments count towards the individual contribution as they indicate essential programming skills (50% of the exercises must be solved by deadline). 
 
 ---
 
@@ -302,3 +303,33 @@ All projects are hosted on GitHub and all group members must gain access to the 
 > [!IMPORTANT]
 > Group members are expected to use issues, branches, commits, pull requests, and code reviews.
 
+---
+
+## Cloning and using the group project
+
+You can clone the group project from the command line by
+```bash
+git clone <project URL>
+cd <project folder>
+julia --project=.
+```
+
+In the Julia REPL, type
+
+```julia
+import Pkg
+Pkg.instantiate()
+
+using <project name>
+hello()
+```
+
+---
+
+### Milestones and deadlines
+
+Every group project has a first issue and pre-configured milestones specifying tasks and the deadlines. 
+
+> [!IMPORTANT]
+> - First deadline (w/o milestone) is **midnight before next session**
+> - First milestone *M1 - Group formation* must be completed **midnight before session 03**

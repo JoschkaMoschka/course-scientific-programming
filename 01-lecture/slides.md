@@ -75,7 +75,7 @@ You can try this out on [Compiler Explorer](https://godbolt.org/).
 
 ### High-level programming languages
 
-[High-level programming languages](https://en.wikipedia.org/wiki/High-level_programming_language) have a strong abstraction from the details of the computer, focusing on being human-readable and -writable.
+[High-level programming languages](https://en.wikipedia.org/wiki/High-level_programming_language) have a strong abstraction from the details of the computer, focusing on being human-readable and human-writable.
 
 > [!IMPORTANT]
 > In order to be executed by a computer, the code must be translated into machine code. A simple instruction written in a high-level programming language, may result in a large number of machine code instructions.
@@ -107,7 +107,7 @@ There are different strategies to convert code written in a high-level programmi
 [WebAssembly](https://en.wikipedia.org/wiki/WebAssembly) is a bytecode format designed as a **portable compilation target**, executed at near-native speed, e.g., in the browser.
 
 > [!IMPORTANT]
-> Despite its name, WebAssembly is **not** an assembly language and no CPU executes it directly. Code written in languages such as C, C++, Rust, or AssemblyScript must be compiled to WebAssembly.
+> Despite its name, WebAssembly is **not** an assembly language and no CPU executes it directly. Code written in languages such as C, C++, Rust, or AssemblyScript is first compiled to WebAssembly and then to machine code.
 
 ===
 
@@ -206,7 +206,7 @@ int main() {
 }
 ```
 
-C++ evolved into a multi-paradigm language, supporting procedural, object-oriented, generic, and functional programming.
+C++ evolved into a multi-paradigm language, supporting procedural, object-oriented, generic, and functional programming. Today, it is dominating high-performance and low latency computing.
 
 ---
 
