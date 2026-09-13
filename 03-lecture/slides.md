@@ -223,7 +223,7 @@ Comparisons of floating point numbers should **always** be made using a small th
 
 ### Floating point comparisons in Julia
 
-In Julia you can use `≈` and `≉` for approximate comparisons:
+In Julia you can use `≈` and `≉ ` for approximate comparisons:
 
 ```julia
 0.1 + 0.2 ≈ 0.3     # true
